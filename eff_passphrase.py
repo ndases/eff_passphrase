@@ -1,19 +1,22 @@
-import requests
+import os
+import urllib.request
 from random import randint
 
 ENDPOINT = 'https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt'
 
+def download_wordlist():
+    urllib.request.urlretrieve(ENDPOINT, 'wordlist.txt')
+
 def get_wordlist():
-    r = requests.get(ENDPOINT)
-    lines = list(filter(None, r.text.split('\n')))
-    wordlist = {}
-    for line in lines:
-        idx, ele = line.split('\t')
-        wordlist[idx] = ele
+    with open('wordlist.txt') as f:
+        lines = f.read().splitlines()
+        wordlist = {}
+        for line in lines:
+            idx, ele = line.split('\t')
+            wordlist[idx] = ele        
         
     return wordlist
             
-
 def generate_word_numbers():
     word_value = ''
     for p in range(0, 5):
@@ -29,7 +32,7 @@ def get_word_by_index(word_id):
     
 def build_pasphrase(count):
     passphrase = ''
-    if count is 0:
+    if count == 0:
         count = 6
     for p in range(count):
         idx = generate_word_numbers()
@@ -38,8 +41,11 @@ def build_pasphrase(count):
     return passphrase
 
 def main():
-    print(build_pasphrase(6))
-
+    if not os.path.exists('wordlist.txt'):
+        download_wordlist()
+        print(build_pasphrase(6))
+    else:
+        print(build_pasphrase(6))
 
 if __name__ == "__main__":
     main()
